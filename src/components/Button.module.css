@@ -1,0 +1,19 @@
+.UIButton {
+  @apply p-2 rounded focus:outline-none focus:ring focus:ring-gray-400;
+
+  &[disabled] {
+    @apply bg-gray-600 cursor-not-allowed text-gray-200;
+  }
+
+  &__Primary {
+    @apply text-gray-100 bg-gray-700;
+  }
+
+  &__Flat {
+    @apply bg-gray-100 text-gray-700;
+  }
+
+  &__Small {
+    @apply py-1 px-2 text-sm;
+  }
+}

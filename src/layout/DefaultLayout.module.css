@@ -1,0 +1,10 @@
+.DefaultLayout {
+  &__NavBar {
+    @apply h-16 w-full bg-white fixed top-0 shadow-sm z-50;
+    @apply py-2 px-4;
+  }
+
+  &__PageContainer {
+    @apply pt-20 px-4 max-w-3xl mx-auto lg:px-0;
+  }
+}

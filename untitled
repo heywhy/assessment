@@ -1,0 +1,120 @@
+id: fa9cdf68-dfc1-4133-be1a-472882b988bc
+secret: nG7aX1sK6pI0pH5kY3vF2jE8eP2oP2pH7lB3mC6aC3sT6bC5uW
+
+set nocompatible
+
+let g:python3_host_prog="/usr/local/bin/python3"
+let $NVIM_PYTHON_LOG_FILE="/tmp/nvim_log"
+let $NVIM_PYTHON_LOG_LEVEL="DEBUG"
+
+call plug#begin(stdpath('config').'/plugged')
+
+" Plug 'ncm2/ncm2'
+Plug 'roxma/nvim-yarp'
+Plug 'sheerun/vim-polyglot'
+" Plug 'ncm2/ncm2-bufword'
+" Plug 'ncm2/ncm2-path'
+Plug 'brooth/far.vim'
+Plug 'elixir-editors/vim-elixir'
+Plug 'elixir-lsp/elixir-ls', { 'do': { -> g:ElixirLS.compile() } }
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'mhartington/nvim-typescript', {'do': './install.sh'}
+
+call plug#end()
+
+set number
+set lazyredraw            " improve scrolling performance when navigating through large results
+set regexpengine=1        " use old regexp engine
+set ignorecase smartcase  " ignore case only when the pattern contains no capital letters
+syntax on
+
+" Coc:Extensions-Config
+let g:coc_global_extensions = ['coc-elixir', 'coc-diagnostic']
+let g:ElixirLS = {}
+let ElixirLS.path = stdpath('config').'/plugged/elixir-ls'
+let ElixirLS.lsp = ElixirLS.path.'/release/language_server.sh'
+let ElixirLS.cmd = join([
+        \ 'cp .release-tool-versions .tool-versions &&',
+        \ 'asdf install &&',
+        \ 'mix do',
+        \ 'local.hex --force --if-missing,',
+        \ 'local.rebar --force,',
+        \ 'deps.get,',
+        \ 'compile,',
+        \ 'elixir_ls.release &&',
+        \ 'rm .tool-versions'
+        \ ], ' ')
+
+
+function ElixirLS.on_stdout(_job_id, data, _event)
+  let self.output[-1] .= a:data[0]
+  call extend(self.output, a:data[1:])
+endfunction
+
+let ElixirLS.on_stderr = function(ElixirLS.on_stdout)
+
+function ElixirLS.on_exit(_job_id, exitcode, _event)
+  if a:exitcode[0] == 0
+    echom '>>> ElixirLS compiled'
+  else
+    echoerr join(self.output, ' ')
+    echoerr '>>> ElixirLS compilation failed'
+  endif
+endfunction
+
+function ElixirLS.compile()
+  let me = copy(g:ElixirLS)
+  let me.output = ['']
+  echom '>>> compiling ElixirLS'
+  let me.id = jobstart('cd ' . me.path . ' && git pull && ' . me.cmd, me)
+endfunction
+
+call coc#config('elixir', {
+  \ 'command': g:ElixirLS.lsp,
+  \ 'filetypes': ['elixir', 'eelixir']
+  \})
+call coc#config('elixir.pathToElixirLS', g:ElixirLS.lsp)
+" End:Coc
+
+
+" enable ncm2 for all buffers
+autocmd BufEnter * call ncm2#enable_for_buffer()
+
+" IMPORTANT: :help Ncm2PopupOpen for more information
+set completeopt=noinsert,menuone,noselect
+
+" suppress the annoying 'match x of y', 'The only match' and 'Pattern not
+" found' messages
+set shortmess+=c
+
+" CTRL-C doesn't trigger the InsertLeave autocmd . map to <ESC> instead.
+inoremap <c-c> <ESC>
+
+" When the <Enter> key is pressed while the popup menu is visible, it only
+" hides the menu. Use this mapping to close the menu and also start a new
+" line.
+inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+
+" Use <TAB> to select the popup menu:
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+" wrap existing omnifunc
+" Note that omnifunc does not run in background and may probably block the
+" editor. If you don't want to be blocked by omnifunc too often, you could
+" add 180ms delay before the omni wrapper:
+"  'on_complete': ['ncm2#on_complete#delay', 180,
+"               \ 'ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
+au User Ncm2Plugin call ncm2#register_source({
+				\ 'name' : 'css',
+				\ 'priority': 9,
+				\ 'subscope_enable': 1,
+				\ 'scope': ['css','scss'],
+				\ 'mark': 'css',
+				\ 'word_pattern': '[\w\-]+',
+				\ 'complete_pattern': ':\s*',
+				\ 'on_complete': ['ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
+				\ })
+
+
