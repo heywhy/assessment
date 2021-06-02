@@ -1,0 +1,23 @@
+.round {
+  @apply rounded-full h-20 w-20;
+}
+
+.square {
+  @apply h-20 w-20;
+}
+
+.rectangle {
+  @apply h-20 w-28;
+}
+
+.oval {
+  @apply h-14 w-28;
+  border-radius: 6.25rem / 3.125rem;
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 3.125rem solid transparent;
+  border-right: 3.125rem solid transparent;
+}

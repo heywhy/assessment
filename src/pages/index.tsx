@@ -2,18 +2,19 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { withDefaultLayout } from 'layout'
 import classNames from 'classnames'
 import { withAuth } from 'components/auth'
+import data from 'src/data.json'
+import { Item } from 'models/data'
+import { ItemShape } from 'components/ItemShape'
 
-const COLORS_SIZE = 5
-const SHAPES_SIZE = 5
+const items = data as Item[]
 
-const colors = [
-  'bg-red-500',
-  'bg-blue-500',
-  'bg-green-500',
-  'bg-yellow-300',
-  'bg-gray-500',
-]
-const shapes = ['oval', 'round', 'triangle', 'square', 'rectangle']
+const toUniqList = (list: string[]) => Array.from(new Set(list))
+
+const colors = toUniqList(items.map(({ color }) => color))
+const shapes = toUniqList(items.map(({ shape }) => shape))
+
+const COLORS_SIZE = colors.length
+const SHAPES_SIZE = shapes.length
 
 type ChangeArgs = {
   colors: string[]
@@ -81,13 +82,11 @@ const Filters = (props: FiltersProps) => {
           {colors.map((val) => (
             <button
               key={val}
-              className={classNames(
-                `capitalize text-sm rounded-full h-6 w-6 ${val}`,
-                {
-                  'border-blue-300 border': !colors$.includes(val),
-                  'border-blue-800 border-2': colors$.includes(val),
-                }
-              )}
+              className={classNames(`capitalize text-sm rounded-full h-6 w-6`, {
+                'border-blue-300 border': !colors$.includes(val),
+                'border-blue-800 border-2': colors$.includes(val),
+              })}
+              style={{ backgroundColor: val }}
               onClick={() => toggle(val, colors$, setColors)}
             />
           ))}
@@ -101,30 +100,49 @@ function Home() {
   const [colors, setColors] = useState<string[]>([])
   const [shapes, setShapes] = useState<string[]>([])
 
-  const filterTitle = useMemo(() => {
+  const filtered = useMemo(() => {
     if (colors.length === COLORS_SIZE && shapes.length === SHAPES_SIZE) {
-      return 'All items'
+      return { title: 'All items', items }
     }
     if (shapes.length === SHAPES_SIZE && colors.length === 1) {
-      const [_, color] = colors[0]?.split('-') || []
-      return `All ${color} items`
+      const [color] = colors
+      const list = items.filter((item) => item.color === color)
+
+      return { title: `All ${color} items`, items: list }
     }
     if (colors.length === COLORS_SIZE && shapes.length === 1) {
-      return `All ${shapes[0]} items`
+      const [shape] = shapes
+      const list = items.filter((item) => item.shape === shape)
+
+      return { title: `All ${shapes[0]} items`, items: list }
     }
     if (colors.length === 1 && shapes.length > 0) {
-      const [_, color] = colors[0]?.split('-') || []
-      return `Multiple ${color} items`
+      const [color] = colors
+      const list = items.filter(
+        (item) => item.color === color && shapes.includes(item.shape)
+      )
+
+      return { title: `Multiple ${color} items`, items: list }
     }
     if (shapes.length === 1 && colors.length > 0) {
-      return `Multiple ${shapes[0]} items`
+      const [shape] = shapes
+      const list = items.filter(
+        (item) => item.shape === shape && colors.includes(item.color)
+      )
+      return { title: `Multiple ${shapes[0]} items`, items: list }
     }
 
     if (shapes.length === 1 && colors.length === 1) {
-      return `Multiple ${shapes[0]} items`
+      const list = items.filter(
+        (item) => item.shape === shapes[0] && item.color === colors[0]
+      )
+      return { title: `Multiple ${shapes[0]} items`, items: list }
     }
+    const list = items.filter(
+      (item) => colors.includes(item.color) && shapes.includes(item.shape)
+    )
 
-    return 'Multiple items'
+    return { title: 'Multiple items', items: list }
   }, [colors.length, shapes.length])
 
   return (
@@ -138,7 +156,13 @@ function Home() {
         }}
       />
 
-      <h2 className="mt-8">{filterTitle}:</h2>
+      <h2 className="mt-8">{filtered.title}:</h2>
+
+      <div className="flex flex-row flex-wrap">
+        {filtered.items.map((item, index) => (
+          <ItemShape key={index} {...item} />
+        ))}
+      </div>
     </>
   )
 }

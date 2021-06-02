@@ -1,4 +1,11 @@
-import { createContext, FC, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import router from 'next/router'
 
 type AuthContext = {
@@ -13,11 +20,23 @@ export const context = createContext<AuthContext>({
 })
 
 export const AuthProvider: FC = ({ children }) => {
-  const [user, setUser] = useState<string>()
-  const signOut = () => setUser(undefined)
+  const [user, setUser] = useState<string | undefined>(() => {
+    if (!global.window) return
+    return localStorage.getItem('auth:info') || undefined
+  })
+
+  const signOut = () => {
+    setUser(undefined)
+    localStorage.removeItem('auth:info')
+  }
+
+  const onSetUser = useCallback((user: string) => {
+    localStorage.setItem('auth:info', user)
+    setUser(user)
+  }, [])
 
   return (
-    <context.Provider value={{ user, setUser, signOut }}>
+    <context.Provider value={{ user, setUser: onSetUser, signOut }}>
       {children}
     </context.Provider>
   )

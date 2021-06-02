@@ -26,7 +26,7 @@ const Login = () => {
   )
 
   return (
-    <div className="bg-gray-100 w-screen h-screen">
+    <div className="w-screen h-screen">
       <div className="mx-auto px-2 max-w-sm absolute inset-0 flex flex-col justify-center items-center">
         <form
           className="bg-white p-4 shadow min-w-full rounded"
