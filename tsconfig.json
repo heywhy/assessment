@@ -19,9 +19,7 @@
     "outDir": "dist",
     "pretty": true,
     "paths": {
-      "*": ["src/*"],
-      "lang": ["lang/*"],
-      "compiled-lang": ["compiled-lang/*"]
+      "*": ["src/*"]
     },
     "target": "es2019",
     "baseUrl": ".",
