@@ -24,14 +24,16 @@ describe('LoginPage', () => {
     const passwordInput = screen.getByTestId('password-input')
 
     fireEvent.change(emailInput, {
-      target: { value: 'unknown@mail.com'}
+      target: { value: 'unknown@mail.com' },
     })
     fireEvent.change(passwordInput, {
-      target: { value: 'password'}
+      target: { value: 'password' },
     })
     fireEvent.click(screen.getByTestId('submit-btn'))
 
-    expect(screen.getByText('These credentials do not exists in our database.')).toBeInTheDocument()
+    expect(
+      screen.getByText('These credentials do not exists in our database.')
+    ).toBeInTheDocument()
   })
 
   it('should redirect to homepage for successful login', () => {
@@ -41,13 +43,13 @@ describe('LoginPage', () => {
     const passwordInput = screen.getByTestId('password-input')
 
     fireEvent.change(emailInput, {
-      target: { value: 'user@test.com'}
+      target: { value: 'user@test.com' },
     })
     fireEvent.change(passwordInput, {
-      target: { value: 'password'}
+      target: { value: 'password' },
     })
     fireEvent.click(screen.getByTestId('submit-btn'))
 
-    expect(router.replace).toBeCalled()
+    expect(router.replace).toBeCalledWith('/')
   })
 })

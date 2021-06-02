@@ -1,12 +1,8 @@
 import { render } from '@testing-library/react'
-import { FC } from 'react'
-
-const Providers: FC<any> = ({ children }) => {
-  return children
-}
+import { MockProviders } from '__mocks__/Providers'
 
 const customRender = (ui: JSX.Element, options = {}) =>
-  render(ui, { wrapper: Providers, ...options })
+  render(<MockProviders {...options}>{ui}</MockProviders>)
 
 // re-export everything
 export * from '@testing-library/react'

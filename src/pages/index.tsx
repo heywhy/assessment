@@ -61,6 +61,7 @@ const Filters = (props: FiltersProps) => {
           {shapes.map((val) => (
             <button
               key={val}
+              data-testid="shape-btn"
               className={classNames(
                 'capitalize text-sm rounded-3xl border mr-1 mt-1 sm:mt-0 py-1 px-3',
                 {
@@ -82,6 +83,7 @@ const Filters = (props: FiltersProps) => {
           {colors.map((val) => (
             <button
               key={val}
+              data-testid="color-btn"
               className={classNames(`capitalize text-sm rounded-full h-6 w-6`, {
                 'border-blue-300 border': !colors$.includes(val),
                 'border-blue-800 border-2': colors$.includes(val),
@@ -156,9 +158,9 @@ function Home() {
         }}
       />
 
-      <h2 className="mt-8">{filtered.title}:</h2>
+      <h2 data-testid="grid-title" className="mt-8">{filtered.title}:</h2>
 
-      <div className="flex flex-row flex-wrap">
+      <div data-testid='items-box' className="flex flex-row flex-wrap">
         {filtered.items.map((item, index) => (
           <ItemShape key={index} {...item} />
         ))}
