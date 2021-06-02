@@ -29,10 +29,12 @@ const Login = () => {
     <div className="w-screen h-screen">
       <div className="mx-auto px-2 max-w-sm absolute inset-0 flex flex-col justify-center items-center">
         <form
+          data-testid="form"
           className="bg-white p-4 shadow min-w-full rounded"
           onSubmit={onSubmit}
         >
           <UIInput
+            data-testid="email-input"
             name="email"
             label="Email"
             type="email"
@@ -41,6 +43,7 @@ const Login = () => {
           />
 
           <UIInput
+            data-testid="password-input"
             className="mt-4"
             name="password"
             label="Password"
@@ -50,6 +53,7 @@ const Login = () => {
 
           <div className="mt-6">
             <UIButton
+              data-testid="submit-btn"
               type="submit"
               className="w-full uppercase"
               label="sign in"
